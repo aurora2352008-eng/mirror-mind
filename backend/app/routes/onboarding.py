@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List
 
 from app.models.twin import TwinProfile
+from app.services.gemini_service import extract_twin_profile
 
 
 router = APIRouter(
@@ -18,24 +19,13 @@ class OnboardingRequest(BaseModel):
 
 @router.post("/")
 def process_onboarding(request: OnboardingRequest):
-    """
-    Temporarily processes the onboarding conversation.
 
-    The AI extraction layer will replace this mock logic later.
-    """
-
-    twin = TwinProfile(
+    twin = extract_twin_profile(
         user_id=request.user_id,
-        goals=[],
-        priorities={},
-        preferences={},
-        routines={},
-        behavioral_patterns=[],
-        past_decisions=[],
-        feedback_history=[]
+        conversation=request.conversation
     )
 
     return {
-        "message": "Onboarding conversation received",
+        "message": "Twin profile extracted successfully",
         "twin_profile": twin
     }

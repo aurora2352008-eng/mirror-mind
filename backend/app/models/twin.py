@@ -1,5 +1,22 @@
 from pydantic import BaseModel, Field
-from typing import List, Dict
+from typing import List
+
+
+class KeyValue(BaseModel):
+    key: str
+    value: str
+
+
+class PastDecision(BaseModel):
+    decision: str
+    context: str
+    outcome: str
+
+
+class FeedbackEntry(BaseModel):
+    decision: str
+    feedback: str
+    outcome: str
 
 
 class TwinProfile(BaseModel):
@@ -7,14 +24,14 @@ class TwinProfile(BaseModel):
 
     goals: List[str] = Field(default_factory=list)
 
-    priorities: Dict[str, str] = Field(default_factory=dict)
+    priorities: List[KeyValue] = Field(default_factory=list)
 
-    preferences: Dict[str, str] = Field(default_factory=dict)
+    preferences: List[KeyValue] = Field(default_factory=list)
 
-    routines: Dict[str, str] = Field(default_factory=dict)
+    routines: List[KeyValue] = Field(default_factory=list)
 
     behavioral_patterns: List[str] = Field(default_factory=list)
 
-    past_decisions: List[Dict] = Field(default_factory=list)
+    past_decisions: List[PastDecision] = Field(default_factory=list)
 
-    feedback_history: List[Dict] = Field(default_factory=list)
+    feedback_history: List[FeedbackEntry] = Field(default_factory=list)
