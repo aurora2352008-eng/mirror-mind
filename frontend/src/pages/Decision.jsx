@@ -1,21 +1,15 @@
 import { useState } from "react";
 
 export default function Decision({ profile, onDecisionComplete }) {
-  const [decision, setDecision] = useState(
-    "Should I submit my project today or tomorrow?"
-  );
+
+  const [decision, setDecision] = useState("");
 
   const [options, setOptions] = useState([
-    "Submit today",
-    "Submit tomorrow"
+    "",
+    ""
   ]);
 
-  const [variables, setVariables] = useState({
-    deadline: "Tomorrow",
-    project_quality: "Needs improvement",
-    stress: "High",
-    remaining_work: "Moderate"
-  });
+  const [currentSituation, setCurrentSituation] = useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -27,70 +21,103 @@ export default function Decision({ profile, onDecisionComplete }) {
     );
   };
 
-  const updateVariable = (key, value) => {
-    setVariables((previous) => ({
-      ...previous,
-      [key]: value
-    }));
-  };
-
   const analyzeDecision = async () => {
-    if (!decision.trim() || options.some((option) => !option.trim())) {
-      alert("Please enter the decision and both options.");
+
+    if (!profile) {
+      alert("Twin Profile is missing. Please build your Twin first.");
+      return;
+    }
+
+    if (!decision.trim()) {
+      alert("Please enter the decision you are facing.");
+      return;
+    }
+
+    if (options.some((option) => !option.trim())) {
+      alert("Please enter both options.");
+      return;
+    }
+
+    if (!currentSituation.trim()) {
+      alert("Please describe what is happening right now.");
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await fetch("http://10.53.162.73:8000/decision/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          user_id: profile?.user_id || "demo_user",
-          decision: decision,
-          options: options,
-          variables: variables
-        })
-      });
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/decision/",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            user_id: profile.user_id,
+            decision: decision,
+            options: options,
+            current_situation: currentSituation,
+            twin_profile: profile
+          })
+        }
+      );
 
       if (!response.ok) {
-        throw new Error("Unable to analyze decision.");
+
+        const errorData = await response
+          .json()
+          .catch(() => null);
+
+        throw new Error(
+          errorData?.detail ||
+          "Unable to analyze decision."
+        );
       }
 
       const data = await response.json();
 
       onDecisionComplete(data);
+
     } catch (error) {
-      console.error(error);
+
+      console.error("Decision error:", error);
 
       alert(
         "Could not connect to Mirror Mind. Make sure the FastAPI backend is running."
       );
+
     } finally {
+
       setLoading(false);
+
     }
   };
 
   return (
     <div className="page">
+
       <div className="container">
 
         <span className="badge">
           STEP 03 · ASK YOUR DECISION TWIN
         </span>
 
-        <h1 className="page-title" style={{ marginTop: "18px" }}>
+        <h1
+          className="page-title"
+          style={{ marginTop: "18px" }}
+        >
           What decision
           <br />
           are you facing?
         </h1>
 
         <p className="page-subtitle">
-          Give Mirror Mind the decision, the choices you are considering,
-          and the conditions that are true right now.
+          Tell Mirror Mind what you are deciding,
+          what your options are, and what is happening right now.
         </p>
 
         <div
@@ -102,7 +129,9 @@ export default function Decision({ profile, onDecisionComplete }) {
         >
 
           {/* Decision */}
+
           <div>
+
             <label className="label">
               Your decision
             </label>
@@ -110,13 +139,19 @@ export default function Decision({ profile, onDecisionComplete }) {
             <textarea
               className="textarea"
               value={decision}
-              onChange={(event) => setDecision(event.target.value)}
-              placeholder="Example: Should I submit my project today or tomorrow?"
+              onChange={(event) =>
+                setDecision(event.target.value)
+              }
+              placeholder="Example: Should I learn Python or Java first?"
             />
+
           </div>
 
+
           {/* Options */}
+
           <div style={{ marginTop: "28px" }}>
+
             <label className="label">
               Options
             </label>
@@ -124,124 +159,61 @@ export default function Decision({ profile, onDecisionComplete }) {
             <div className="grid grid-2">
 
               {options.map((option, index) => (
+
                 <input
                   key={index}
                   className="input"
                   value={option}
                   onChange={(event) =>
-                    updateOption(index, event.target.value)
+                    updateOption(
+                      index,
+                      event.target.value
+                    )
                   }
                   placeholder={`Option ${index + 1}`}
                 />
+
               ))}
 
             </div>
+
           </div>
 
-          {/* Variables */}
+
+          {/* Current situation */}
+
           <div style={{ marginTop: "28px" }}>
 
-            <div className="row space-between">
-              <label className="label">
-                Current situation
-              </label>
+            <label className="label">
+              What's happening right now?
+            </label>
 
-              <span className="badge">
-                Decision Variables
-              </span>
-            </div>
+            <textarea
+              className="textarea"
+              value={currentSituation}
+              onChange={(event) =>
+                setCurrentSituation(event.target.value)
+              }
+              placeholder="Describe the situation, constraints, priorities, or anything else that matters for this decision..."
+              rows={5}
+            />
 
-            <div className="grid grid-2">
+            <p
+              className="muted"
+              style={{
+                marginTop: "8px",
+                fontSize: "0.85rem"
+              }}
+            >
+              Mirror Mind will identify the relevant decision
+              factors automatically.
+            </p>
 
-              <div>
-                <label className="label">
-                  Deadline
-                </label>
-
-                <select
-                  className="select"
-                  value={variables.deadline}
-                  onChange={(event) =>
-                    updateVariable(
-                      "deadline",
-                      event.target.value
-                    )
-                  }
-                >
-                  <option>Today</option>
-                  <option>Tomorrow</option>
-                  <option>In 2 days</option>
-                  <option>In 1 week</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="label">
-                  Project quality
-                </label>
-
-                <select
-                  className="select"
-                  value={variables.project_quality}
-                  onChange={(event) =>
-                    updateVariable(
-                      "project_quality",
-                      event.target.value
-                    )
-                  }
-                >
-                  <option>Good</option>
-                  <option>Needs improvement</option>
-                  <option>Poor</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="label">
-                  Stress level
-                </label>
-
-                <select
-                  className="select"
-                  value={variables.stress}
-                  onChange={(event) =>
-                    updateVariable(
-                      "stress",
-                      event.target.value
-                    )
-                  }
-                >
-                  <option>Low</option>
-                  <option>Moderate</option>
-                  <option>High</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="label">
-                  Remaining work
-                </label>
-
-                <select
-                  className="select"
-                  value={variables.remaining_work}
-                  onChange={(event) =>
-                    updateVariable(
-                      "remaining_work",
-                      event.target.value
-                    )
-                  }
-                >
-                  <option>Very little</option>
-                  <option>Moderate</option>
-                  <option>A lot</option>
-                </select>
-              </div>
-
-            </div>
           </div>
 
+
           {/* Analyze */}
+
           <div
             style={{
               marginTop: "32px",
@@ -249,6 +221,7 @@ export default function Decision({ profile, onDecisionComplete }) {
               borderTop: "1px solid #e5e7eb"
             }}
           >
+
             <button
               className="primary-button"
               style={{
@@ -258,13 +231,17 @@ export default function Decision({ profile, onDecisionComplete }) {
               onClick={analyzeDecision}
               disabled={loading}
             >
+
               {loading
                 ? "Mirror Mind is analyzing..."
                 : "Analyze My Decision →"}
+
             </button>
+
           </div>
 
         </div>
+
 
         <p
           className="muted"
@@ -274,11 +251,12 @@ export default function Decision({ profile, onDecisionComplete }) {
             fontSize: "0.85rem"
           }}
         >
-          Mirror Mind will explain which factors are influencing the
-          recommendation and what could change it.
+          Mirror Mind will identify what matters to you,
+          explain its recommendation, and show what could change it.
         </p>
 
       </div>
+
     </div>
   );
 }

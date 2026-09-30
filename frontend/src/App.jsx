@@ -19,6 +19,7 @@ export default function App() {
 
   const renderPage = () => {
     switch (currentPage) {
+
       case "onboarding":
         return (
           <Onboarding
@@ -67,9 +68,18 @@ export default function App() {
 
       case "landing":
       default:
-        return <Landing onStart={() => navigate("onboarding")} />;
+        return (
+          <Landing
+            onStart={() => navigate("onboarding")}
+            onNavigate={navigate}
+          />
+        );
     }
   };
 
-  return <div className="app">{renderPage()}</div>;
+  return (
+    <div className="app">
+      {renderPage()}
+    </div>
+  );
 }

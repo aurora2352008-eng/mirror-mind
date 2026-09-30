@@ -1,20 +1,39 @@
-export default function Landing({ onStart }) {
+export default function Landing({ onStart, onNavigate }) {
   return (
     <div className="landing-page">
 
       {/* Navigation */}
       <nav className="navbar">
-        <div className="logo">
-          Mirror<span>Mind</span>
-        </div>
+
+        <button
+          className="landing-logo-button"
+          onClick={() => onNavigate("landing")}
+        >
+          <div className="logo">
+            Mirror<span>Mind</span>
+          </div>
+        </button>
 
         <div className="nav-links">
-          <span>How It Works</span>
-          <span>Decision Twin</span>
+
+          <button onClick={() => onNavigate("landing")}>
+            Home
+          </button>
+
+          <button onClick={() => onNavigate("profile")}>
+            Personal Twin
+          </button>
+
+          <button onClick={() => onNavigate("decision")}>
+            Decision Twin
+          </button>
+
         </div>
+
       </nav>
 
-      {/* Hero Section */}
+
+      {/* Hero */}
       <main className="hero">
 
         <div className="hero-content">
@@ -35,11 +54,15 @@ export default function Landing({ onStart }) {
             decision twin for academic choices.
           </p>
 
-          <button className="primary-button" onClick={onStart}>
+          <button
+            className="primary-button"
+            onClick={onStart}
+          >
             Build My Twin →
           </button>
 
         </div>
+
 
         {/* Twin Preview */}
         <div className="twin-preview">
@@ -47,35 +70,57 @@ export default function Landing({ onStart }) {
           <div className="preview-card">
 
             <div className="card-header">
+
               <div>
-                <p className="small-label">YOUR DIGITAL TWIN</p>
-                <h3>Academic Decision Profile</h3>
+                <p className="small-label">
+                  YOUR DIGITAL TWIN
+                </p>
+
+                <h3>
+                  Academic Decision Profile
+                </h3>
               </div>
 
               <div className="status-dot"></div>
+
             </div>
 
+
             <div className="profile-row">
-              <div className="profile-icon">🎓</div>
+
+              <div className="profile-icon">
+                🎓
+              </div>
 
               <div>
-                <p className="profile-title">Student Profile</p>
+                <p className="profile-title">
+                  Student Profile
+                </p>
+
                 <p className="profile-subtitle">
                   Goals & preferences continuously evolving
                 </p>
               </div>
+
             </div>
 
+
             <div className="insight-box">
-              <p className="small-label">CURRENT INSIGHT</p>
+
+              <p className="small-label">
+                CURRENT INSIGHT
+              </p>
 
               <p>
                 Your twin is learning how you prioritize
                 academic deadlines and project quality.
               </p>
+
             </div>
 
+
             <div className="mini-stats">
+
               <div>
                 <strong>Goals</strong>
                 <span>Tracked</span>
@@ -90,6 +135,7 @@ export default function Landing({ onStart }) {
                 <strong>Feedback</strong>
                 <span>Updating</span>
               </div>
+
             </div>
 
           </div>
@@ -98,33 +144,34 @@ export default function Landing({ onStart }) {
 
       </main>
 
-      {/* Bottom Information */}
+
+      {/* Features */}
       <section className="features">
 
         <div>
           <h3>01</h3>
+          <strong>Understand You</strong>
           <p>
-            <strong>Understand You</strong>
-            <br />
-            Build a profile from your goals, preferences and behaviour.
+            Build a profile from your goals,
+            preferences and behaviour.
           </p>
         </div>
 
         <div>
           <h3>02</h3>
+          <strong>Evaluate Choices</strong>
           <p>
-            <strong>Evaluate Choices</strong>
-            <br />
-            Compare decisions using your personal context.
+            Compare decisions using your
+            personal context.
           </p>
         </div>
 
         <div>
           <h3>03</h3>
+          <strong>Learn From Feedback</strong>
           <p>
-            <strong>Learn From Feedback</strong>
-            <br />
-            Improve the twin as your decisions evolve.
+            Improve the twin as your
+            decisions evolve.
           </p>
         </div>
 

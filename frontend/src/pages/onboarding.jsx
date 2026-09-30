@@ -37,7 +37,7 @@ export default function Onboarding({ onComplete }) {
     setLoading(true);
 
     try {
-      const response = await fetch("http://10.53.162.73:8000/onboarding/", {
+      const response = await fetch("http://127.0.0.1:8000/onboarding/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
