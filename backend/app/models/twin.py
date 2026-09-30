@@ -9,8 +9,8 @@ class KeyValue(BaseModel):
 
 class PastDecision(BaseModel):
     decision: str
-    context: str
-    outcome: str
+    context: str = ""
+    outcome: str = ""
 
 
 class FeedbackEntry(BaseModel):

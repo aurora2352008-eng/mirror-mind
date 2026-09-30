@@ -1,12 +1,15 @@
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List
+
+from app.models.twin import TwinProfile
 
 
 class DecisionRequest(BaseModel):
     user_id: str
     decision: str
     options: List[str]
-    variables: Dict[str, str]
+    current_situation: str
+    twin_profile: TwinProfile
 
 
 class DecisionFactor(BaseModel):
