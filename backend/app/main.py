@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.routes.onboarding import router as onboarding_router
+from app.routes.decision import router as decision_router
 
 app = FastAPI(
     title="Mirror Mind API",
@@ -7,6 +8,7 @@ app = FastAPI(
     version="1.0.0"
 )
 app.include_router(onboarding_router)
+app.include_router(decision_router)
 
 
 @app.get("/")
