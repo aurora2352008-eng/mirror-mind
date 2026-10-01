@@ -30,8 +30,7 @@ class TwinProfile(BaseModel):
 
     routines: List[KeyValue] = Field(default_factory=list)
 
-    behavioral_patterns: List[str] = Field(default_factory=list)
-
+    behavioral_patterns: List[KeyValue] = Field(default_factory=list)
     past_decisions: List[PastDecision] = Field(default_factory=list)
 
     feedback_history: List[FeedbackEntry] = Field(default_factory=list)

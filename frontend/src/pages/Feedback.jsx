@@ -1,15 +1,50 @@
+
 import { useState } from "react";
 
-export default function Feedback({ decision, onComplete }) {
-  const [feedback, setFeedback] = useState("");
+export default function Feedback({ profile, decision, onComplete }) {
+  const [chosenOption, setChosenOption] = useState("");
+  const [accepted, setAccepted] = useState("");
+  const [reason, setReason] = useState("");
   const [outcome, setOutcome] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  const submitFeedback = () => {
-    if (!feedback.trim() || !outcome.trim()) {
-      alert("Please describe the feedback and actual outcome.");
+  if (!decision) {
+    return (
+      <div className="page">
+        <div className="container">
+          <h1 className="page-title">No decision available.</h1>
+        </div>
+      </div>
+    );
+  }
+
+  const options = decision.decision_context?.options || [];
+
+  const recommendation = decision.recommendation || "";
+
+  const submitFeedback = async () => {
+    if (!chosenOption || !accepted || !reason.trim() || !outcome.trim()) {
+      alert("Please complete all the fields.");
       return;
     }
+
+    const feedbackData = {
+      user_id: profile?.user_id || "demo_user",
+      decision: decision.decision_context?.decision || "",
+      recommendation: recommendation,
+      chosen_option: chosenOption,
+      situation: decision.decision_context?.current_situation || "",
+      accepted_assessment: accepted,
+      reason: reason,
+      outcome: outcome
+    };
+
+    console.log("Twin learning data:", feedbackData);
+
+    /*
+     * For the MVP, keep the learning data ready as a structured
+     * feedback record. Backend persistence can be connected next.
+     */
 
     setSubmitted(true);
   };
@@ -18,49 +53,72 @@ export default function Feedback({ decision, onComplete }) {
     return (
       <div className="page">
         <div className="container">
+
+          <span className="badge">
+            STEP 05 · TWIN LEARNING
+          </span>
+
+          <h1
+            className="page-title"
+            style={{ marginTop: "18px" }}
+          >
+            Your Twin learned
+            <br />
+            from this decision.
+          </h1>
+
+          <p
+            className="page-subtitle"
+            style={{ marginTop: "18px" }}
+          >
+            Your choice, reasoning, and outcome can help Mirror Mind
+            understand how you make decisions in similar situations.
+          </p>
+
           <div
             className="card"
             style={{
-              maxWidth: "700px",
-              margin: "100px auto",
-              textAlign: "center"
+              marginTop: "40px",
+              background: "#eef2ff"
             }}
           >
             <span className="badge">
-              TWIN UPDATED
+              DECISION RECORDED
             </span>
 
-            <h1
-              className="page-title"
-              style={{
-                fontSize: "3.5rem",
-                marginTop: "18px"
-              }}
+            <h2
+              className="section-title"
+              style={{ marginTop: "14px" }}
             >
-              Mirror Mind
-              <br />
-              learned from this decision.
-            </h1>
+              {chosenOption}
+            </h2>
 
             <p
               className="muted"
               style={{
-                marginTop: "18px",
-                lineHeight: "1.7"
+                marginTop: "12px",
+                lineHeight: "1.6"
               }}
             >
-              Your feedback and actual outcome can now be used to
-              improve how the Twin understands your future decisions.
+              Your reasoning has been captured as behavioral feedback.
             </p>
+          </div>
 
+          <div
+            className="row"
+            style={{
+              justifyContent: "flex-end",
+              marginTop: "24px"
+            }}
+          >
             <button
               className="primary-button"
-              style={{ marginTop: "28px" }}
               onClick={onComplete}
             >
-              Return to Twin Profile →
+              Back to Twin Profile →
             </button>
           </div>
+
         </div>
       </div>
     );
@@ -71,116 +129,214 @@ export default function Feedback({ decision, onComplete }) {
       <div className="container">
 
         <span className="badge">
-          STEP 05 · LEARN FROM THE OUTCOME
+          STEP 05 · DECISION OUTCOME
         </span>
 
-        <h1 className="page-title" style={{ marginTop: "18px" }}>
-          What actually
+        <h1
+          className="page-title"
+          style={{ marginTop: "18px" }}
+        >
+          What did you
           <br />
-          happened?
+          actually choose?
         </h1>
 
         <p className="page-subtitle">
-          Mirror Mind compares its recommendation with what actually
-          happened so the Twin can become more useful over time.
+          Mirror Mind wants to learn from what you actually decided,
+          not just what it predicted.
         </p>
 
-        {/* Previous recommendation */}
-        {decision && (
-          <div
-            className="card"
-            style={{
-              maxWidth: "800px",
-              margin: "40px auto 0"
-            }}
-          >
-            <span className="badge">
-              PREVIOUS RECOMMENDATION
-            </span>
-
-            <h2
-              className="section-title"
-              style={{ marginTop: "14px" }}
-            >
-              {decision.recommendation}
-            </h2>
-
-            <p
-              className="muted"
-              style={{
-                marginTop: "10px",
-                lineHeight: "1.6"
-              }}
-            >
-              Now tell Mirror Mind what happened after you made
-              the decision.
-            </p>
-          </div>
-        )}
-
-        {/* Feedback form */}
+        {/* Actual choice */}
         <div
           className="card"
-          style={{
-            maxWidth: "800px",
-            margin: "24px auto 0"
-          }}
+          style={{ marginTop: "40px" }}
         >
+          <span className="badge">
+            YOUR CHOICE
+          </span>
 
-          <div>
-            <label className="label">
-              How useful was the recommendation?
-            </label>
-
-            <textarea
-              className="textarea"
-              value={feedback}
-              onChange={(event) =>
-                setFeedback(event.target.value)
-              }
-              placeholder="Example: The recommendation was useful because..."
-            />
-          </div>
-
-          <div style={{ marginTop: "24px" }}>
-            <label className="label">
-              What was the actual outcome?
-            </label>
-
-            <textarea
-              className="textarea"
-              value={outcome}
-              onChange={(event) =>
-                setOutcome(event.target.value)
-              }
-              placeholder="Example: I submitted the project today and managed to fix the most important issues."
-            />
-          </div>
-
-          <button
-            className="primary-button"
-            style={{
-              width: "100%",
-              marginTop: "24px"
-            }}
-            onClick={submitFeedback}
+          <h2
+            className="section-title"
+            style={{ marginTop: "14px" }}
           >
-            Update My Twin →
-          </button>
+            Select the option you chose.
+          </h2>
 
+          <div
+            style={{
+              display: "grid",
+              gap: "12px",
+              marginTop: "20px"
+            }}
+          >
+            {options.map((option, index) => (
+              <button
+                key={index}
+                className={
+                  chosenOption === option
+                    ? "primary-button"
+                    : "secondary-button"
+                }
+                style={{
+                  width: "100%",
+                  textAlign: "left"
+                }}
+                onClick={() => setChosenOption(option)}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+
+          <input
+            className="input"
+            style={{ marginTop: "12px" }}
+            placeholder="Or enter another choice..."
+            value={
+              options.includes(chosenOption)
+                ? ""
+                : chosenOption
+            }
+            onChange={(e) => setChosenOption(e.target.value)}
+          />
         </div>
 
-        <p
-          className="muted"
+        {/* Situation-aware reflection */}
+        <div
+          className="card"
+          style={{ marginTop: "28px" }}
+        >
+          <span className="badge">
+            MIRROR MIND CHECK
+          </span>
+
+          <h2
+            className="section-title"
+            style={{ marginTop: "14px" }}
+          >
+            Before you continue
+          </h2>
+
+          <p
+            className="muted"
+            style={{
+              marginTop: "10px",
+              lineHeight: "1.7"
+            }}
+          >
+            Based on the current situation and your selected option,
+            Mirror Mind wants you to confirm that you understand the
+            important trade-offs, risks, or effects involved.
+          </p>
+
+          <label
+            className="label"
+            style={{ marginTop: "22px" }}
+          >
+            Are you comfortable proceeding with this choice?
+          </label>
+
+          <div className="row" style={{ marginTop: "12px" }}>
+            <button
+              className={
+                accepted === "yes"
+                  ? "primary-button"
+                  : "secondary-button"
+              }
+              onClick={() => setAccepted("yes")}
+            >
+              Yes, I'm comfortable
+            </button>
+
+            <button
+              className={
+                accepted === "no"
+                  ? "primary-button"
+                  : "secondary-button"
+              }
+              onClick={() => setAccepted("no")}
+            >
+              No, reconsider
+            </button>
+          </div>
+        </div>
+
+        {/* Reason */}
+        <div
+          className="card"
+          style={{ marginTop: "28px" }}
+        >
+          <span className="badge">
+            TEACH YOUR TWIN
+          </span>
+
+          <h2
+            className="section-title"
+            style={{ marginTop: "14px" }}
+          >
+            What influenced your choice?
+          </h2>
+
+          <p
+            className="muted"
+            style={{
+              marginTop: "8px",
+              lineHeight: "1.6"
+            }}
+          >
+            Tell Mirror Mind what mattered most when you made
+            the decision.
+          </p>
+
+          <textarea
+            className="textarea"
+            style={{ marginTop: "18px" }}
+            placeholder="Example: I chose this because avoiding the deadline risk mattered more to me."
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+          />
+        </div>
+
+        {/* Outcome */}
+        <div
+          className="card"
+          style={{ marginTop: "28px" }}
+        >
+          <span className="badge">
+            OUTCOME
+          </span>
+
+          <h2
+            className="section-title"
+            style={{ marginTop: "14px" }}
+          >
+            What happened after your decision?
+          </h2>
+
+          <textarea
+            className="textarea"
+            style={{ marginTop: "18px" }}
+            placeholder="Describe the result..."
+            value={outcome}
+            onChange={(e) => setOutcome(e.target.value)}
+          />
+        </div>
+
+        {/* Submit */}
+        <div
+          className="row"
           style={{
-            textAlign: "center",
-            marginTop: "18px",
-            fontSize: "0.85rem"
+            justifyContent: "flex-end",
+            marginTop: "24px"
           }}
         >
-          Your feedback helps Mirror Mind understand future
-          decisions more accurately.
-        </p>
+          <button
+            className="primary-button"
+            onClick={submitFeedback}
+          >
+            Teach My Twin →
+          </button>
+        </div>
 
       </div>
     </div>

@@ -53,6 +53,7 @@ export default function App() {
         return (
           <DecisionDNA
             result={decisionResult}
+            profile={twinProfile}
             onContinue={() => navigate("feedback")}
           />
         );
@@ -71,7 +72,6 @@ export default function App() {
         return (
           <Landing
             onStart={() => navigate("onboarding")}
-            onNavigate={navigate}
           />
         );
     }

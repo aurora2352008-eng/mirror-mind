@@ -1,16 +1,9 @@
 import { useState } from "react";
 
 export default function Decision({ profile, onDecisionComplete }) {
-
   const [decision, setDecision] = useState("");
-
-  const [options, setOptions] = useState([
-    "",
-    ""
-  ]);
-
+  const [options, setOptions] = useState(["", ""]);
   const [currentSituation, setCurrentSituation] = useState("");
-
   const [loading, setLoading] = useState(false);
 
   const updateOption = (index, value) => {
@@ -22,42 +15,29 @@ export default function Decision({ profile, onDecisionComplete }) {
   };
 
   const analyzeDecision = async () => {
-
-    if (!profile) {
-      alert("Twin Profile is missing. Please build your Twin first.");
-      return;
-    }
-
-    if (!decision.trim()) {
-      alert("Please enter the decision you are facing.");
-      return;
-    }
-
-    if (options.some((option) => !option.trim())) {
-      alert("Please enter both options.");
-      return;
-    }
-
-    if (!currentSituation.trim()) {
-      alert("Please describe what is happening right now.");
+    if (
+      !decision.trim() ||
+      options.some((option) => !option.trim()) ||
+      !currentSituation.trim()
+    ) {
+      alert(
+        "Please enter the decision, both options, and the current situation."
+      );
       return;
     }
 
     setLoading(true);
 
     try {
-
       const response = await fetch(
         "http://127.0.0.1:8000/decision/",
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json"
           },
-
           body: JSON.stringify({
-            user_id: profile.user_id,
+            user_id: profile?.user_id || "demo_user",
             decision: decision,
             options: options,
             current_situation: currentSituation,
@@ -66,40 +46,35 @@ export default function Decision({ profile, onDecisionComplete }) {
         }
       );
 
+      const data = await response.json();
+
       if (!response.ok) {
-
-        const errorData = await response
-          .json()
-          .catch(() => null);
-
         throw new Error(
-          errorData?.detail ||
-          "Unable to analyze decision."
+          data.detail || "Unable to analyze decision."
         );
       }
 
-      const data = await response.json();
-
-      onDecisionComplete(data);
-
+      onDecisionComplete({
+        ...data,
+        decision_context: {
+          decision: decision,
+          options: options,
+          current_situation: currentSituation
+        }
+      });
     } catch (error) {
-
-      console.error("Decision error:", error);
+      console.error(error);
 
       alert(
-        "Could not connect to Mirror Mind. Make sure the FastAPI backend is running."
+        `Could not analyze the decision.\n\n${error.message}`
       );
-
     } finally {
-
       setLoading(false);
-
     }
   };
 
   return (
     <div className="page">
-
       <div className="container">
 
         <span className="badge">
@@ -116,8 +91,8 @@ export default function Decision({ profile, onDecisionComplete }) {
         </h1>
 
         <p className="page-subtitle">
-          Tell Mirror Mind what you are deciding,
-          what your options are, and what is happening right now.
+          Give Mirror Mind the decision, the choices you are
+          considering, and what is happening right now.
         </p>
 
         <div
@@ -129,9 +104,7 @@ export default function Decision({ profile, onDecisionComplete }) {
         >
 
           {/* Decision */}
-
           <div>
-
             <label className="label">
               Your decision
             </label>
@@ -142,16 +115,12 @@ export default function Decision({ profile, onDecisionComplete }) {
               onChange={(event) =>
                 setDecision(event.target.value)
               }
-              placeholder="Example: Should I learn Python or Java first?"
+              placeholder="Example: Should I submit my project today or tomorrow?"
             />
-
           </div>
 
-
           {/* Options */}
-
           <div style={{ marginTop: "28px" }}>
-
             <label className="label">
               Options
             </label>
@@ -159,7 +128,6 @@ export default function Decision({ profile, onDecisionComplete }) {
             <div className="grid grid-2">
 
               {options.map((option, index) => (
-
                 <input
                   key={index}
                   className="input"
@@ -172,20 +140,16 @@ export default function Decision({ profile, onDecisionComplete }) {
                   }
                   placeholder={`Option ${index + 1}`}
                 />
-
               ))}
 
             </div>
-
           </div>
 
-
-          {/* Current situation */}
-
+          {/* Current Situation */}
           <div style={{ marginTop: "28px" }}>
 
             <label className="label">
-              What's happening right now?
+              Current situation
             </label>
 
             <textarea
@@ -194,26 +158,12 @@ export default function Decision({ profile, onDecisionComplete }) {
               onChange={(event) =>
                 setCurrentSituation(event.target.value)
               }
-              placeholder="Describe the situation, constraints, priorities, or anything else that matters for this decision..."
-              rows={5}
+              placeholder="Describe what is happening right now and anything important that could affect the decision."
             />
-
-            <p
-              className="muted"
-              style={{
-                marginTop: "8px",
-                fontSize: "0.85rem"
-              }}
-            >
-              Mirror Mind will identify the relevant decision
-              factors automatically.
-            </p>
 
           </div>
 
-
           {/* Analyze */}
-
           <div
             style={{
               marginTop: "32px",
@@ -221,7 +171,6 @@ export default function Decision({ profile, onDecisionComplete }) {
               borderTop: "1px solid #e5e7eb"
             }}
           >
-
             <button
               className="primary-button"
               style={{
@@ -231,17 +180,13 @@ export default function Decision({ profile, onDecisionComplete }) {
               onClick={analyzeDecision}
               disabled={loading}
             >
-
               {loading
                 ? "Mirror Mind is analyzing..."
                 : "Analyze My Decision →"}
-
             </button>
-
           </div>
 
         </div>
-
 
         <p
           className="muted"
@@ -251,12 +196,11 @@ export default function Decision({ profile, onDecisionComplete }) {
             fontSize: "0.85rem"
           }}
         >
-          Mirror Mind will identify what matters to you,
-          explain its recommendation, and show what could change it.
+          Mirror Mind uses your Twin Profile and current situation
+          to explain its recommendation and what could change it.
         </p>
 
       </div>
-
     </div>
   );
 }
